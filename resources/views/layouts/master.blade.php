@@ -89,10 +89,10 @@
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="../layout/top-nav.html" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Top Navigation</p>
-                </a>
+                <router-link to="/users" class="nav-link">
+                  <i class="fas fa-users nav-icon"></i>
+                  <p>Users</p>
+                </router-link>
               </li>
               <li class="nav-item">
                 <a href="../layout/top-nav-sidebar.html" class="nav-link">
@@ -111,12 +111,15 @@
             </router-link>
           </li>
           <li class="nav-item">
-            <a href="../widgets.html" class="nav-link">
+            <a class="nav-link" href="{{ route('logout') }}"
+              onclick="event.preventDefault();
+              document.getElementById('logout-form').submit();">
               <i class="nav-icon fas fa-power-off"></i>
-              <p>
-                Logout
-              </p>
+              <p>{{ __('Logout') }}</p>
             </a>
+            <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+              @csrf
+            </form>
           </li>
         </ul>        
       </nav>

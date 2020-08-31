@@ -12,3 +12,13 @@ $fa-font-path: "../webfonts";
 // Bootstrap
 @import "~bootstrap/scss/bootstrap";
 @import "~admin-lte/dist/css/adminlte.css";
+
+.navbar-laravel {
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+.router-link-exact-active {
+    background-color: #494e53;
+    color: white !important;
+}
