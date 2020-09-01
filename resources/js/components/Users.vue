@@ -1,93 +1,302 @@
 <template>
-  <div class="container">
-    <div class="row mt-2">
-      <div class="col-md-12">
-        <h3>Users Table</h3>
-        <div class="card mt-3">
-          <div class="card-header">
-            <button class="btn btn-success" data-toggle="modal" data-target="#addNew">Add New</button>
-            <div class="card-tools">
-              <div class="input-group input-group-sm" style="width: 150px;">
-                <input
-                  type="text"
-                  name="table_search"
-                  class="form-control float-right"
-                  placeholder="Search"
-                />
+    <div class="container">
+        <div class="row mt-2">
+            <div class="col-md-12">
+                <h3>Users Table</h3>
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <button class="btn btn-success" @click="openModal()">
+                            Add New
+                        </button>
+                        <div class="card-tools">
+                            <div
+                                class="input-group input-group-sm"
+                                style="width: 150px;"
+                            >
+                                <input
+                                    type="text"
+                                    name="table_search"
+                                    class="form-control float-right"
+                                    placeholder="Search"
+                                />
 
-                <div class="input-group-append">
-                  <button type="submit" class="btn btn-default">
-                    <i class="fas fa-search"></i>
-                  </button>
+                                <div class="input-group-append">
+                                    <button
+                                        type="submit"
+                                        class="btn btn-default"
+                                    >
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body table-responsive p-0">
+                        <table class="table table-hover text-nowrap">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Type</th>
+                                    <th>Created At</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="user in users" :key="user.id">
+                                    <td>{{ user.id }}</td>
+                                    <td>{{ user.name }}</td>
+                                    <td>{{ user.email }}</td>
+                                    <td>{{ user.type | upText }}</td>
+                                    <td>{{ user.created_at | dateFormat }}</td>
+                                    <td>
+                                        <button
+                                            class="btn btn-info"
+                                            @click="editModal(user)"
+                                        >
+                                            Edit
+                                        </button>
+                                        <button
+                                            class="btn btn-danger"
+                                            @click="deleteUser(user.id)"
+                                        >
+                                            Delete
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- /.card-body -->
                 </div>
-              </div>
+                <!-- /.card -->
             </div>
-          </div>
-          <!-- /.card-header -->
-          <div class="card-body table-responsive p-0">
-            <table class="table table-hover text-nowrap">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Name</th>
-                  <th>Email</th>
-                  <th>Type</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>183</td>
-                  <td>John Doe</td>
-                  <td>11-7-2014</td>
-                  <td>
-                    <span class="tag tag-success">Approved</span>
-                  </td>
-                  <td>
-                    <button class="btn btn-info">Edit</button>
-                    <button class="btn btn-danger">Delete</button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <!-- /.card-body -->
         </div>
-        <!-- /.card -->
-      </div>
-    </div>
-    <!-- Modal -->
-    <div
-      class="modal fade"
-      id="addNew"
-      tabindex="-1"
-      role="dialog"
-      aria-labelledby="addNewLabel"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="addNewLabel">Add New</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">...</div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-primary">Save</button>
-          </div>
+        <!-- Modal -->
+        <div
+            class="modal fade"
+            id="addNew"
+            tabindex="-1"
+            role="dialog"
+            aria-labelledby="addNewLabel"
+            aria-hidden="true"
+        >
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addNewLabel">Add New</h5>
+                        <button
+                            type="button"
+                            class="close"
+                            data-dismiss="modal"
+                            aria-label="Close"
+                        >
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form @submit.prevent="createUser">
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <input
+                                    v-model="form.name"
+                                    type="text"
+                                    name="name"
+                                    class="form-control"
+                                    placeholder="Name"
+                                    :class="{
+                                        'is-invalid': form.errors.has('name')
+                                    }"
+                                />
+                                <has-error
+                                    :form="form"
+                                    field="name"
+                                ></has-error>
+                            </div>
+                            <div class="form-group">
+                                <input
+                                    v-model="form.email"
+                                    type="text"
+                                    name="email"
+                                    class="form-control"
+                                    placeholder="Email"
+                                    :class="{
+                                        'is-invalid': form.errors.has('email')
+                                    }"
+                                />
+                                <has-error
+                                    :form="form"
+                                    field="email"
+                                ></has-error>
+                            </div>
+                            <div class="form-group">
+                                <input
+                                    v-model="form.password"
+                                    type="password"
+                                    name="password"
+                                    class="form-control"
+                                    placeholder="Password"
+                                    :class="{
+                                        'is-invalid': form.errors.has(
+                                            'password'
+                                        )
+                                    }"
+                                />
+                                <has-error
+                                    :form="form"
+                                    field="password"
+                                ></has-error>
+                            </div>
+                            <div class="form-group">
+                                <select
+                                    v-model="form.type"
+                                    name="type"
+                                    id="type"
+                                    class="form-control"
+                                    :class="{
+                                        'is-invalid': form.errors.has('type')
+                                    }"
+                                >
+                                    <option value>Select User Role</option>
+                                    <option value="admin">Admin</option>
+                                    <option value="user">User</option>
+                                    <option value="author">Author</option>
+                                </select>
+                                <has-error
+                                    :form="form"
+                                    field="email"
+                                ></has-error>
+                            </div>
+                            <div class="form-group">
+                                <input
+                                    v-model="form.bio"
+                                    type="text"
+                                    name="bio"
+                                    class="form-control"
+                                    placeholder="Short bio (optional)"
+                                    :class="{
+                                        'is-invalid': form.errors.has('bio')
+                                    }"
+                                />
+                                <has-error :form="form" field="bio"></has-error>
+                            </div>
+                            <!-- <div class="form-group">
+                            <input
+                                v-model="form.photo"
+                                type="text"
+                                name="email"
+                                class="form-control"
+                                placeholder="Email"
+                                :class="{
+                                    'is-invalid': form.errors.has('email')
+                                }"
+                            />
+                            <has-error :form="form" field="email"></has-error>
+              </div>-->
+                        </div>
+                        <div class="modal-footer">
+                            <button
+                                type="button"
+                                class="btn btn-danger"
+                                data-dismiss="modal"
+                            >
+                                Close
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                Save
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
 </template>
 
 <script>
 export default {
-  mounted() {
-    console.log("Component mounted.");
-  },
+    data() {
+        return {
+            users: {},
+            form: new Form({
+                name: "",
+                email: "",
+                password: "",
+                type: "",
+                bio: "",
+                photo: ""
+            })
+        };
+    },
+    methods: {
+        loadUsers() {
+            // this.$Progress.start();
+            axios.get("api/user").then(({ data }) => (this.users = data.data));
+            // this.$Progress.finish();
+        },
+        newModal() {
+            this.form.reset();
+            $("#addNew").modal("show");
+        },
+        editModal(userdata) {
+            this.form.reset();
+            $("#addNew").modal("show");
+            this.form.fill(userdata);
+        },
+        createUser() {
+            this.$Progress.start();
+            this.form.post("api/user");
+            Fire.$emit("AfterAction");
+            Toast.fire({
+                icon: "success",
+                title: "New user created succesfully"
+            });
+            $("#addNew").modal("hide");
+            this.$Progress.finish();
+        },
+        deleteUser(id) {
+            Swal.fire({
+                title: "Are you sure?",
+                text: "You won't be able to revert this!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, delete it!"
+            })
+                .then(result => {
+                    if (result.value) {
+                        this.$Progress.start();
+                        this.form
+                            .delete("api/user/" + id)
+                            .then(() => {
+                                Fire.$emit("AfterAction");
+                                Toast.fire({
+                                    icon: "success",
+                                    title: "User deleted succesfully"
+                                });
+                                this.$Progress.finish();
+                            })
+                            .catch(() => {
+                                Swal(
+                                    "Failed!",
+                                    "There was something wrong",
+                                    "warning"
+                                );
+                            });
+                    }
+                })
+                .catch(() => {
+                    Swal("Failed!", "There was something wrong", "warning");
+                });
+        }
+    },
+    mounted() {
+        this.loadUsers();
+        Fire.$on("AfterAction", () => {
+            this.loadUsers();
+        });
+    }
 };
 </script>

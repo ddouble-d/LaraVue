@@ -137,6 +137,8 @@
       <!-- Default box -->
       <div class="container-fluid">
         <router-view></router-view>
+        
+        <vue-progress-bar></vue-progress-bar>
       </div>
       <!-- /.card -->
 

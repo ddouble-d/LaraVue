@@ -5,31 +5,72 @@
  */
 
 require("./bootstrap");
+import moment from "moment";
+import { Form, HasError, AlertError } from "vform";
+import VueRouter from "vue-router";
+import { values } from "lodash";
+import VueProgressBar from "vue-progressbar";
+import Swal from "sweetalert2";
 
 window.Vue = require("vue");
-
-import VueRouter from "vue-router";
-Vue.use(VueRouter);
-
-let routes = [
-    {
-        path: "/dashboard",
-        component: require("./components/Dashboard.vue").default
-    },
-    {
-        path: "/profile",
-        component: require("./components/Profile.vue").default
-    },
-    {
-        path: "/users",
-        component: require("./components/Users.vue").default
+window.Form = Form;
+window.Swal = Swal;
+window.Fire = new Vue();
+window.Toast = Swal.mixin({
+    toast: true,
+    position: "top-end",
+    showConfirmButton: false,
+    timer: 3000,
+    timerProgressBar: true,
+    onOpen: toast => {
+        toast.addEventListener("mouseenter", Swal.stopTimer);
+        toast.addEventListener("mouseleave", Swal.resumeTimer);
     }
-];
+});
+
+Vue.component(HasError.name, HasError);
+Vue.component(AlertError.name, AlertError);
+
+Vue.use(VueRouter);
+Vue.use(VueProgressBar, {
+    color: "#41578d",
+    failedColor: "#874b4b",
+    thickness: "5px",
+    transition: {
+        speed: "0.2s",
+        opacity: "0.6s",
+        termination: 300
+    },
+    autoRevert: true,
+    location: "top",
+    inverse: false
+});
+
+Vue.filter("upText", function(text) {
+    return text.charAt(0).toUpperCase() + text.slice(1);
+});
+Vue.filter("dateFormat", function(text) {
+    return moment(text).format("LL");
+});
 
 const router = new VueRouter({
     mode: "history",
-    routes // short for `routes: routes`
+    routes: [
+        {
+            path: "/dashboard",
+            component: require("./components/Dashboard.vue").default
+        },
+        {
+            path: "/profile",
+            component: require("./components/Profile.vue").default
+        },
+        {
+            path: "/users",
+            component: require("./components/Users.vue").default
+        }
+    ]
 });
+
 /**
  * The following block of code may be used to automatically register your
  * Vue components. It will recursively scan this directory for the Vue
