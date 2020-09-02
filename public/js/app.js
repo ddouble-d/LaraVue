@@ -2166,55 +2166,24 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
       users: {},
       form: new Form({
+        id: "",
         name: "",
         email: "",
         password: "",
         type: "",
         bio: "",
         photo: ""
-      })
+      }),
+      modal: {
+        is_create: "",
+        button_text: "",
+        button_load: ""
+      }
     };
   },
   methods: {
@@ -2227,28 +2196,65 @@ __webpack_require__.r(__webpack_exports__);
         return _this.users = data.data;
       }); // this.$Progress.finish();
     },
-    newModal: function newModal() {
+    createModal: function createModal() {
       this.form.reset();
+      this.modal.is_create = true;
+      this.modal.button_text = "Save";
+      this.modal.button_load = false;
       $("#addNew").modal("show");
     },
     editModal: function editModal(userdata) {
       this.form.reset();
+      this.modal.is_create = false;
+      this.modal.button_text = "Update";
+      this.modal.button_load = false;
       $("#addNew").modal("show");
       this.form.fill(userdata);
     },
     createUser: function createUser() {
+      var _this2 = this;
+
       this.$Progress.start();
-      this.form.post("api/user");
-      Fire.$emit("AfterAction");
-      Toast.fire({
-        icon: "success",
-        title: "New user created succesfully"
+      this.modal.button_load = true;
+      this.modal.button_text = "<span class=\"spinner-border spinner-border-sm\" role=\"status\" aria-hidden=\"true\"></span>";
+      this.form.post("api/user").then(function () {
+        Fire.$emit("AfterAction");
+        Toast.fire({
+          icon: "success",
+          title: "New user created succesfully"
+        });
+        $("#addNew").modal("hide");
+
+        _this2.$Progress.finish();
+      })["catch"](function () {
+        _this2.$Progress.fail();
+
+        Swal("Failed!", "There was something wrong", "warning");
       });
-      $("#addNew").modal("hide");
-      this.$Progress.finish();
+    },
+    updateUser: function updateUser() {
+      var _this3 = this;
+
+      this.$Progress.start();
+      this.modal.button_load = true;
+      this.modal.button_text = "<span class=\"spinner-border spinner-border-sm\" role=\"status\" aria-hidden=\"true\"></span>";
+      this.form.put("api/user/" + this.form.id).then(function () {
+        Fire.$emit("AfterAction");
+        Toast.fire({
+          icon: "success",
+          title: "User updated succesfully"
+        });
+        $("#addNew").modal("hide");
+
+        _this3.$Progress.finish();
+      })["catch"](function () {
+        _this3.$Progress.fail();
+
+        Swal("Failed!", "There was something wrong", "warning");
+      });
     },
     deleteUser: function deleteUser(id) {
-      var _this2 = this;
+      var _this4 = this;
 
       Swal.fire({
         title: "Are you sure?",
@@ -2260,17 +2266,19 @@ __webpack_require__.r(__webpack_exports__);
         confirmButtonText: "Yes, delete it!"
       }).then(function (result) {
         if (result.value) {
-          _this2.$Progress.start();
+          _this4.$Progress.start();
 
-          _this2.form["delete"]("api/user/" + id).then(function () {
+          _this4.form["delete"]("api/user/" + id).then(function () {
             Fire.$emit("AfterAction");
             Toast.fire({
               icon: "success",
               title: "User deleted succesfully"
             });
 
-            _this2.$Progress.finish();
+            _this4.$Progress.finish();
           })["catch"](function () {
+            _this4.$Progress.fail();
+
             Swal("Failed!", "There was something wrong", "warning");
           });
         }
@@ -2280,11 +2288,11 @@ __webpack_require__.r(__webpack_exports__);
     }
   },
   mounted: function mounted() {
-    var _this3 = this;
+    var _this5 = this;
 
     this.loadUsers();
     Fire.$on("AfterAction", function () {
-      _this3.loadUsers();
+      _this5.loadUsers();
     });
   }
 });
@@ -63380,15 +63388,11 @@ var render = function() {
                 staticClass: "btn btn-success",
                 on: {
                   click: function($event) {
-                    return _vm.openModal()
+                    return _vm.createModal()
                   }
                 }
               },
-              [
-                _vm._v(
-                  "\n                        Add New\n                    "
-                )
-              ]
+              [_vm._v("Add New")]
             ),
             _vm._v(" "),
             _vm._m(0)
@@ -63425,11 +63429,7 @@ var render = function() {
                             }
                           }
                         },
-                        [
-                          _vm._v(
-                            "\n                                        Edit\n                                    "
-                          )
-                        ]
+                        [_vm._v("Edit")]
                       ),
                       _vm._v(" "),
                       _c(
@@ -63442,11 +63442,7 @@ var render = function() {
                             }
                           }
                         },
-                        [
-                          _vm._v(
-                            "\n                                        Delete\n                                    "
-                          )
-                        ]
+                        [_vm._v("Delete")]
                       )
                     ])
                   ])
@@ -63480,7 +63476,43 @@ var render = function() {
           },
           [
             _c("div", { staticClass: "modal-content" }, [
-              _vm._m(2),
+              _c("div", { staticClass: "modal-header" }, [
+                _c(
+                  "h5",
+                  {
+                    directives: [
+                      {
+                        name: "show",
+                        rawName: "v-show",
+                        value: _vm.modal.is_create,
+                        expression: "modal.is_create"
+                      }
+                    ],
+                    staticClass: "modal-title",
+                    attrs: { id: "addNewLabel" }
+                  },
+                  [_vm._v("Add New User")]
+                ),
+                _vm._v(" "),
+                _c(
+                  "h5",
+                  {
+                    directives: [
+                      {
+                        name: "show",
+                        rawName: "v-show",
+                        value: !_vm.modal.is_create,
+                        expression: "!modal.is_create"
+                      }
+                    ],
+                    staticClass: "modal-title",
+                    attrs: { id: "addNewLabel" }
+                  },
+                  [_vm._v("Update User")]
+                ),
+                _vm._v(" "),
+                _vm._m(2)
+              ]),
               _vm._v(" "),
               _c(
                 "form",
@@ -63488,7 +63520,7 @@ var render = function() {
                   on: {
                     submit: function($event) {
                       $event.preventDefault()
-                      return _vm.createUser($event)
+                      _vm.modal.is_create ? _vm.createUser() : _vm.updateUser()
                     }
                   }
                 },
@@ -63725,7 +63757,25 @@ var render = function() {
                     )
                   ]),
                   _vm._v(" "),
-                  _vm._m(3)
+                  _c("div", { staticClass: "modal-footer" }, [
+                    _c(
+                      "button",
+                      {
+                        staticClass: "btn btn-danger",
+                        attrs: { type: "button", "data-dismiss": "modal" }
+                      },
+                      [_vm._v("Close")]
+                    ),
+                    _vm._v(" "),
+                    _c("button", {
+                      staticClass: "btn btn-primary",
+                      attrs: {
+                        type: "submit",
+                        disabled: _vm.modal.button_load
+                      },
+                      domProps: { innerHTML: _vm._s(_vm.modal.button_text) }
+                    })
+                  ])
                 ]
               )
             ])
@@ -63788,49 +63838,18 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "modal-header" }, [
-      _c("h5", { staticClass: "modal-title", attrs: { id: "addNewLabel" } }, [
-        _vm._v("Add New")
-      ]),
-      _vm._v(" "),
-      _c(
-        "button",
-        {
-          staticClass: "close",
-          attrs: {
-            type: "button",
-            "data-dismiss": "modal",
-            "aria-label": "Close"
-          }
-        },
-        [_c("span", { attrs: { "aria-hidden": "true" } }, [_vm._v("×")])]
-      )
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "modal-footer" }, [
-      _c(
-        "button",
-        {
-          staticClass: "btn btn-danger",
-          attrs: { type: "button", "data-dismiss": "modal" }
-        },
-        [
-          _vm._v(
-            "\n                            Close\n                        "
-          )
-        ]
-      ),
-      _vm._v(" "),
-      _c(
-        "button",
-        { staticClass: "btn btn-primary", attrs: { type: "submit" } },
-        [_vm._v("\n                            Save\n                        ")]
-      )
-    ])
+    return _c(
+      "button",
+      {
+        staticClass: "close",
+        attrs: {
+          type: "button",
+          "data-dismiss": "modal",
+          "aria-label": "Close"
+        }
+      },
+      [_c("span", { attrs: { "aria-hidden": "true" } }, [_vm._v("×")])]
+    )
   }
 ]
 render._withStripped = true
