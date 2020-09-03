@@ -30,6 +30,18 @@ window.Toast = Swal.mixin({
 
 Vue.component(HasError.name, HasError);
 Vue.component(AlertError.name, AlertError);
+Vue.component(
+    "passport-clients",
+    require("./components/passport/Clients.vue").default
+);
+Vue.component(
+    "passport-authorized-clients",
+    require("./components/passport/AuthorizedClients.vue").default
+);
+Vue.component(
+    "passport-personal-access-tokens",
+    require("./components/passport/PersonalAccessTokens.vue").default
+);
 
 Vue.use(VueRouter);
 Vue.use(VueProgressBar, {
@@ -67,6 +79,10 @@ const router = new VueRouter({
         {
             path: "/users",
             component: require("./components/Users.vue").default
+        },
+        {
+            path: "/developer",
+            component: require("./components/Developer.vue").default
         }
     ]
 });
