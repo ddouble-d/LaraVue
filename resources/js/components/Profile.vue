@@ -13,11 +13,7 @@
             <h5 class="widget-user-desc text-right">Web Designer</h5>
           </div>
           <div class="widget-user-image">
-            <img
-              class="img-circle"
-              src="https://adminlte.io/themes/v3/dist/img/user3-128x128.jpg"
-              alt="User Avatar"
-            />
+            <img class="img-circle" :src="getProfilePhoto()" alt="User Avatar" />
           </div>
           <div class="card-footer">
             <div class="row">
@@ -85,6 +81,9 @@
                         class="form-control"
                         id="inputName"
                         placeholder="Name"
+                        :class="{
+                                        'is-invalid': form.errors.has('name')
+                                    }"
                       />
                     </div>
                   </div>
@@ -97,13 +96,24 @@
                         class="form-control"
                         id="inputEmail"
                         placeholder="Email"
+                        :class="{
+                                        'is-invalid': form.errors.has('email')
+                                    }"
                       />
                     </div>
                   </div>
                   <div class="form-group row">
-                    <label for="inputExperience" class="col-sm-2 col-form-label">Experience</label>
+                    <label for="inputBio" class="col-sm-2 col-form-label">Bio</label>
                     <div class="col-sm-10">
-                      <textarea class="form-control" id="inputExperience" placeholder="Experience"></textarea>
+                      <textarea
+                        class="form-control"
+                        v-model="form.bio"
+                        id="inputBio"
+                        placeholder="Bio"
+                        :class="{
+                                          'is-invalid': form.errors.has('bio')
+                                      }"
+                      ></textarea>
                     </div>
                   </div>
                   <div class="form-group row">
@@ -121,19 +131,27 @@
                     </div>
                   </div>
                   <div class="form-group row">
-                    <label for="inputPassport" class="col-sm-2 col-form-label">Passport (Optional)</label>
+                    <label for="inputPassword" class="col-sm-2 col-form-label">Password (Optional)</label>
                     <div class="col-sm-10">
                       <input
                         type="password"
+                        v-model="form.password"
                         class="form-control"
-                        id="inputPassport"
-                        placeholder="Passport"
+                        id="inputPassword"
+                        placeholder="Password"
+                        :class="{
+                                        'is-invalid': form.errors.has('password')
+                                    }"
                       />
                     </div>
                   </div>
                   <div class="form-group row">
                     <div class="offset-sm-2 col-sm-10">
-                      <button type="submit" class="btn btn-danger">Submit</button>
+                      <button
+                        @click.prevent="updateInfo"
+                        type="submit"
+                        class="btn btn-danger"
+                      >Submit</button>
                     </div>
                   </div>
                 </form>
@@ -162,23 +180,62 @@ export default {
         bio: "",
         photo: "",
       }),
+      current_photo: "",
     };
   },
   methods: {
+    loadProfile() {
+      axios.get("api/profile").then(({ data }) => {
+        this.current_photo = data.photo;
+        return this.form.fill(data);
+      });
+    },
     updateProfile(e) {
-      // console.log("uploaded");
       let file = e.target.files[0];
       let reader = new FileReader();
-      reader.onloadend = (file) => {
-        // console.log("RESULT", reader.result);
-        this.form.photo = reader.result;
-      };
-      reader.readAsDataURL(file);
+      // if file size large than 2MB
+      if (file["size"] < 2111775) {
+        reader.onloadend = (file) => {
+          // console.log(this.form.photo);
+          this.form.photo = reader.result;
+        };
+        reader.readAsDataURL(file);
+      } else {
+        Swal.fire(
+          "Error!",
+          "You're uploading file is larger than 2MB. It should be less than 2MB",
+          "error"
+        );
+      }
+    },
+    updateInfo() {
+      this.$Progress.start();
+      this.form
+        .put("api/profile")
+        .then(() => {
+          Fire.$emit("AfterAction");
+          Toast.fire({
+            icon: "success",
+            title: "User updated succesfully",
+          });
+          this.$Progress.finish();
+        })
+        .catch(() => {
+          this.$Progress.fail();
+        });
+    },
+    getProfilePhoto() {
+      let profile_photo = this.form.photo.match(/\//)
+        ? this.current_photo
+        : this.form.photo;
+      return "img/profile/" + profile_photo;
     },
   },
-  mounted() {},
   created() {
-    axios.get("api/profile").then(({ data }) => this.form.fill(data));
+    this.loadProfile();
+    Fire.$on("AfterAction", () => {
+      this.loadProfile();
+    });
   },
 };
 </script>

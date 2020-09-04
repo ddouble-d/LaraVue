@@ -236,7 +236,7 @@ export default {
         })
         .catch(() => {
           this.$Progress.fail();
-          Swal("Failed!", "There was something wrong", "warning");
+          Swal.fire("Failed!", "There was something wrong", "warning");
         });
     },
     updateUser() {
@@ -256,7 +256,7 @@ export default {
         })
         .catch(() => {
           this.$Progress.fail();
-          Swal("Failed!", "There was something wrong", "warning");
+          Swal.fire("Failed!", "There was something wrong", "warning");
         });
     },
     deleteUser(id) {
@@ -284,12 +284,12 @@ export default {
               })
               .catch(() => {
                 this.$Progress.fail();
-                Swal("Failed!", "There was something wrong", "warning");
+                Swal.fire("Failed!", "There was something wrong", "warning");
               });
           }
         })
         .catch(() => {
-          Swal("Failed!", "There was something wrong", "warning");
+          Swal.fire("Failed!", "There was something wrong", "warning");
         });
     },
   },
