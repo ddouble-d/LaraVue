@@ -78,6 +78,7 @@
               </p>
             </router-link>
           </li>
+          @can('isAdmin')
           <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
               <i class="nav-icon fas fa-cog"></i>
@@ -103,15 +104,6 @@
             </ul>
           </li>  
           <li class="nav-item">
-            <router-link to="/profile" class="nav-link">
-              <i class="nav-icon fas fa-user"></i>
-              <p>
-                Profile
-              </p>
-            </router-link>
-          </li>
-          @can('isAdmin')
-          <li class="nav-item">
             <router-link to="/developer" class="nav-link">
               <i class="nav-icon fas fa-cogs"></i>
               <p>
@@ -120,6 +112,15 @@
             </router-link>
           </li>
           @endcan
+          <li class="nav-item">
+            <router-link to="/profile" class="nav-link">
+              <i class="nav-icon fas fa-user"></i>
+              <p>
+                Profile
+              </p>
+            </router-link>
+          </li>
+          
           <li class="nav-item">
             <a class="nav-link" href="{{ route('logout') }}"
               onclick="event.preventDefault();
@@ -159,6 +160,11 @@
 
 </div>
 <!-- ./wrapper -->
+@auth
+<script>
+  window.user = @json(auth()->user())
+</script>
+@endauth
 <!-- AdminLTE for demo purposes -->
 <script src="/js/app.js"></script>
 </body>

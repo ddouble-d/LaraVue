@@ -11,6 +11,7 @@ import VueRouter from "vue-router";
 import { values } from "lodash";
 import VueProgressBar from "vue-progressbar";
 import Swal from "sweetalert2";
+import Gate from "./Gate";
 
 window.Vue = require("vue");
 window.Form = Form;
@@ -42,6 +43,8 @@ Vue.component(
     "passport-personal-access-tokens",
     require("./components/passport/PersonalAccessTokens.vue").default
 );
+Vue.component("not-found", require("./components/404.vue").default);
+Vue.component("pagination", require("laravel-vue-pagination"));
 
 Vue.use(VueRouter);
 Vue.use(VueProgressBar, {
@@ -64,6 +67,8 @@ Vue.filter("upText", function(text) {
 Vue.filter("dateFormat", function(text) {
     return moment(text).format("LL");
 });
+
+Vue.prototype.$gate = new Gate(window.user);
 
 const router = new VueRouter({
     mode: "history",
