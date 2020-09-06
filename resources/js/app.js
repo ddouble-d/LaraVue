@@ -88,6 +88,10 @@ const router = new VueRouter({
         {
             path: "/developer",
             component: require("./components/Developer.vue").default
+        },
+        {
+            path: "*",
+            component: require("./components/404.vue").default
         }
     ]
 });
@@ -116,5 +120,13 @@ const router = new VueRouter({
 
 const app = new Vue({
     el: "#app",
-    router
+    router,
+    data: {
+        search: ""
+    },
+    methods: {
+        searchit: _.debounce(() => {
+            Fire.$emit("searching");
+        }, 300)
+    }
 });

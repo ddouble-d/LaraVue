@@ -2733,62 +2733,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -2814,11 +2758,10 @@ __webpack_require__.r(__webpack_exports__);
       var _this = this;
 
       if (this.$gate.isAdmin()) {
-        // this.$Progress.start();
         axios.get("api/user").then(function (_ref) {
           var data = _ref.data;
           return _this.users = data;
-        }); // this.$Progress.finish();
+        });
       }
     },
     getResults: function getResults() {
@@ -2927,6 +2870,12 @@ __webpack_require__.r(__webpack_exports__);
     this.getResults();
     Fire.$on("AfterAction", function () {
       _this6.loadUsers();
+    });
+    Fire.$on("searching", function () {
+      var query = _this6.$parent.search;
+      axios.get("api/findUser?query=" + query).then(function (data) {
+        _this6.users = data.data;
+      })["catch"](function () {});
     });
   }
 });
@@ -67201,11 +67150,7 @@ var render = function() {
                       }
                     }
                   },
-                  [
-                    _vm._v(
-                      "\n                        Add New\n                    "
-                    )
-                  ]
+                  [_vm._v("Add New")]
                 ),
                 _vm._v(" "),
                 _vm._m(0)
@@ -67242,11 +67187,7 @@ var render = function() {
                                 }
                               }
                             },
-                            [
-                              _vm._v(
-                                "\n                                        Edit\n                                    "
-                              )
-                            ]
+                            [_vm._v("Edit")]
                           ),
                           _vm._v(" "),
                           _c(
@@ -67259,11 +67200,7 @@ var render = function() {
                                 }
                               }
                             },
-                            [
-                              _vm._v(
-                                "\n                                        Delete\n                                    "
-                              )
-                            ]
+                            [_vm._v("Delete")]
                           )
                         ])
                       ])
@@ -67325,11 +67262,7 @@ var render = function() {
                     staticClass: "modal-title",
                     attrs: { id: "addNewLabel" }
                   },
-                  [
-                    _vm._v(
-                      "\n                        Add New User\n                    "
-                    )
-                  ]
+                  [_vm._v("Add New User")]
                 ),
                 _vm._v(" "),
                 _c(
@@ -67346,11 +67279,7 @@ var render = function() {
                     staticClass: "modal-title",
                     attrs: { id: "addNewLabel" }
                   },
-                  [
-                    _vm._v(
-                      "\n                        Update User\n                    "
-                    )
-                  ]
+                  [_vm._v("Update User")]
                 ),
                 _vm._v(" "),
                 _vm._m(2)
@@ -67606,11 +67535,7 @@ var render = function() {
                         staticClass: "btn btn-danger",
                         attrs: { type: "button", "data-dismiss": "modal" }
                       },
-                      [
-                        _vm._v(
-                          "\n                            Close\n                        "
-                        )
-                      ]
+                      [_vm._v("Close")]
                     ),
                     _vm._v(" "),
                     _c("button", {
@@ -84329,6 +84254,9 @@ var router = new vue_router__WEBPACK_IMPORTED_MODULE_2__["default"]({
   }, {
     path: "/developer",
     component: __webpack_require__(/*! ./components/Developer.vue */ "./resources/js/components/Developer.vue")["default"]
+  }, {
+    path: "*",
+    component: __webpack_require__(/*! ./components/404.vue */ "./resources/js/components/404.vue")["default"]
   }]
 });
 /**
@@ -84353,7 +84281,15 @@ var router = new vue_router__WEBPACK_IMPORTED_MODULE_2__["default"]({
 
 var app = new Vue({
   el: "#app",
-  router: router
+  router: router,
+  data: {
+    search: ""
+  },
+  methods: {
+    searchit: _.debounce(function () {
+      Fire.$emit("searching");
+    }, 300)
+  }
 });
 
 /***/ }),
